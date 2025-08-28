@@ -264,6 +264,7 @@ EOF
 start_vm() {
     info "Starting VM..."
     
+    # Remove -nographic since we're using -daemonize
     qemu-system-x86_64 \
         -machine type=q35,accel=kvm \
         -cpu host \
@@ -273,12 +274,13 @@ start_vm() {
         -drive file=init.img,if=virtio \
         -netdev user,id=net0,hostfwd=tcp::2222-:22 \
         -device virtio-net-pci,netdev=net0 \
-        -nographic \
-        -daemonize
+        -daemonize \
+        -vnc :1  # Add VNC display for headless operation
     
     info "VM started in background!"
     info "You can SSH into the VM with: ssh -p 2222 vps@localhost"
     info "The terminal prompt will appear as 'Vps@ubuntu#~'"
+    info "VM is also accessible via VNC at localhost:5901"
 }
 
 # Main execution
