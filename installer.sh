@@ -300,5 +300,16 @@ start_vm() {
     info "VM is also accessible via VNC at localhost:5901"
 }
 
+main() {
+    check_dependencies
+    create_vm_directory
+    download_debian_image
+    create_cloud_init
+    create_vm_disk
+    install_pterodactyl_wings
+    configure_iptables
+    start_vm
+}
+
 # Run main function
 main "$@"
