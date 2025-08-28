@@ -119,8 +119,9 @@ ethernets:
     dhcp6: false
 EOF
 
-    # Create cloud-init disk
-    cloud-localds init.img user-data meta-data network-config || error "Failed to create cloud-init disk"
+    # Create cloud-init disk - FIXED: network-config is not a direct argument to cloud-localds
+    # Instead, we need to use the -N flag for network configuration
+    cloud-localds -v -N network-config init.img user-data meta-data || error "Failed to create cloud-init disk"
 }
 
 # Create VM disk
@@ -157,7 +158,7 @@ if [ "$KERNEL_VERSION" -lt 6 ]; then
     if ! grep -q "swapaccount=1" /etc/default/grub; then
         sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="[^"]*/& swapaccount=1/' /etc/default/grub
         update-grub
-        warn "Swap enabled. reboot required to take effect."
+        echo "Swap enabled. Reboot required to take effect."
     fi
 fi
 
@@ -186,10 +187,10 @@ SERVICE
 
 systemctl daemon-reload
 
-info "Pterodactyl Wings installation script created!"
-info "After booting the VM, run:"
-info "1. sudo systemctl enable --now wings"
-info "2. Configure your wings config in /etc/pterodactyl/config.yml"
+echo "Pterodactyl Wings installation script created!"
+echo "After booting the VM, run:"
+echo "1. sudo systemctl enable --now wings"
+echo "2. Configure your wings config in /etc/pterodactyl/config.yml"
 EOF
 
     chmod +x install-wings.sh
@@ -253,7 +254,7 @@ iptables-restore < /etc/iptables/rules.v4
 systemctl enable netfilter-persistent
 systemctl start netfilter-persistent
 
-info "iptables configured for Docker!"
+echo "iptables configured for Docker!"
 EOF
 
     chmod +x configure-iptables.sh
