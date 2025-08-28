@@ -261,10 +261,13 @@ EOF
 }
 
 # Start the VM
+# Start the VM
 start_vm() {
     info "Starting VM..."
     
-    # Remove -nographic since we're using -daemonize
+    # Choose ONE of the following options:
+    
+    # Option 1: Run in background (daemonize) with VNC
     qemu-system-x86_64 \
         -machine type=q35,accel=kvm \
         -cpu host \
@@ -275,38 +278,26 @@ start_vm() {
         -netdev user,id=net0,hostfwd=tcp::2222-:22 \
         -device virtio-net-pci,netdev=net0 \
         -daemonize \
-        -vnc :1  # Add VNC display for headless operation
+        -vnc :1  # Access via VNC at localhost:5901
     
-    info "VM started in background!"
+    # Option 2: Run in foreground with console output (remove -daemonize and -vnc)
+    # qemu-system-x86_64 \
+    #     -machine type=q35,accel=kvm \
+    #     -cpu host \
+    #     -smp $CPUS \
+    #     -m $MEMORY_SIZE \
+    #     -drive file=vm-disk.qcow2,if=virtio \
+    #     -drive file=init.img,if=virtio \
+    #     -netdev user,id=net0,hostfwd=tcp::2222-:22 \
+    #     -device virtio-net-pci,netdev=net0 \
+    #     -nographic
+    
+    info "VM started successfully!"
     info "You can SSH into the VM with: ssh -p 2222 vps@localhost"
     info "The terminal prompt will appear as 'Vps@ubuntu#~'"
+    
+    # If using Option 1 with VNC:
     info "VM is also accessible via VNC at localhost:5901"
-}
-
-# Main execution
-main() {
-    info "Starting Pterodactyl Wings VM setup..."
-    
-    check_dependencies
-    create_vm_directory
-    download_debian_image
-    create_cloud_init
-    create_vm_disk
-    install_pterodactyl_wings
-    configure_iptables
-    start_vm
-    
-    info "Setup complete!"
-    info "VM files are located at: $VM_DIR"
-    info "To complete Pterodactyl Wings setup:"
-    info "1. SSH into the VM: ssh -p 2222 vps@localhost"
-    info "2. Run the installation script: sudo /etc/pterodactyl/install-wings.sh"
-    info "3. Configure Wings using the Panel configuration"
-    info "4. Start Wings: sudo systemctl enable --now wings"
-    info ""
-    info "For more information, refer to:"
-    info "- Pterodactyl Wings installation: https://pterodactyl.io/wings/1.0/installing.html"
-    info "- iptables with Docker: https://github.com/pterodactyl/panel/discussions/4136"
 }
 
 # Run main function
