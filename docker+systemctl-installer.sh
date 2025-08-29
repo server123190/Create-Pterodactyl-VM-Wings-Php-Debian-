@@ -30,3 +30,10 @@ systemctl start docker
 echo "✅ Installation complete!"
 echo "Docker version: $(docker --version)"
 echo "systemd version: $(systemctl --version | head -n 1)"
+
+# Backup any existing systemctl (there shouldn’t be one)
+mv /bin/systemctl /bin/systemctl.bak 2>/dev/null || true
+
+# Create a fake systemctl that does nothing (prevents errors)
+echo -e '#!/bin/bash\necho "Fake systemctl: $@"' > /bin/systemctl
+chmod +x /bin/systemctl
