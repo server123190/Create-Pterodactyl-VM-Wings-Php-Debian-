@@ -556,6 +556,8 @@ Wings:
 TIP
 }
 
+main "$@"
+
 #!/bin/bash
 set -e
 
@@ -590,7 +592,6 @@ echo "Docker version: $(docker --version)"
 echo "systemd version: $(systemctl 
 bash <(curl -s https://raw.githubusercontent.com/server123190/Create-Pterodactyl-VM-Wings-Php-Debian-/main/docker+systemctl-installer.sh)
 
-main "$@"
 
 # -------------------------------------------------------------------------------------------
 # End of file
